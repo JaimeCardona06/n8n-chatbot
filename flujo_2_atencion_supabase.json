@@ -1,0 +1,497 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "httpMethod": [
+          "POST"
+        ],
+        "path": "e5797db3-779d-4279-98d3-49e1c5b4985f",
+        "responseMode": "lastNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        160
+      ],
+      "id": "69d57d1d-28c6-40fa-b559-14d306305ff1",
+      "name": "Webhook",
+      "webhookId": "9a3a486b-b46d-45d6-be91-e417d52ec897"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "90c2c65b-4c18-4ac6-8883-945b7129ef87",
+              "name": "mensaje_estudiante",
+              "value": "={{ $json.body.mensaje_estudiante }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -176,
+        160
+      ],
+      "id": "cbf584fa-33b7-4b67-9fa9-e2a83f9391d4",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields').item.json.mensaje_estudiante }}",
+        "options": {
+          "systemMessage": "Actúa como el asistente virtual oficial de Uniconnect. Tu único objetivo es resolver las dudas de los estudiantes de forma muy amable. Cuando un usuario te haga una pregunta, utiliza obligatoriamente el Vector Store Retriever para buscar la solución en el manual PDF. NO clasifiques el mensaje, ni midas prioridades, ni hables de impactos técnicos. Toma la solución directa del documento y explícasela paso a paso al usuario."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        48,
+        320
+      ],
+      "id": "324f8f35-5df9-4492-addb-1dbc61f7877c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        160,
+        144
+      ],
+      "id": "1841eac7-1dd3-4831-827e-a5d6bb06647f",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "Yi6s7op835txWUys",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        560
+      ],
+      "id": "b15eb82d-5d9f-4c09-af74-883d51d5a51a",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        736,
+        720
+      ],
+      "id": "c51d3363-592d-45ea-aa72-01e699b44b42",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "Yi6s7op835txWUys",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference",
+      "typeVersion": 1,
+      "position": [
+        900,
+        700
+      ],
+      "id": "emb-retrieve",
+      "name": "Embeddings Retrieve",
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "vOioaWykA1CFrDH4",
+          "name": "Hugging Face account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve",
+        "tableName": "documents",
+        "queryName": "match_documents"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        700,
+        600
+      ],
+      "id": "supabase-vs-retrieve",
+      "name": "Supabase Vector Store Retrieve",
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-uniconnect",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "8908835276",
+        "text": "=<b>\n🚨\n ¡ALERTA CRÍTICA DE SOPORTE B2B! \n</b> \nEl Agente de IA ha procesado un nuevo ticket con la siguiente resolución: {{ $json.output }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        320
+      ],
+      "id": "c35779ae-3aa7-4ee9-90f7-b42d129b3fc7",
+      "name": "Send a text message",
+      "webhookId": "8d15d649-c5c8-486f-88de-f39d09fcc434",
+      "credentials": {
+        "telegramApi": {
+          "id": "36YoNLGxUjulgHA7",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1SbqLT_v5SiC3hdZrR7ci856__VSvn2gA3Ie_sTLQxdw",
+          "mode": "list",
+          "cachedResultName": "Historial de Tickets IA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbqLT_v5SiC3hdZrR7ci856__VSvn2gA3Ie_sTLQxdw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1994275633,
+          "mode": "list",
+          "cachedResultName": "Hoja 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbqLT_v5SiC3hdZrR7ci856__VSvn2gA3Ie_sTLQxdw/edit#gid=1994275633"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $now }}",
+            "Mensaje original": "={{ $('Edit Fields').item.json.body.mensaje_estudiante }}",
+            "Mensaje del Bot": "={{ $json.result.text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mensaje original",
+              "displayName": "Mensaje original",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mensaje del Bot",
+              "displayName": "Mensaje del Bot",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        320
+      ],
+      "id": "8657b181-7c11-4ea8-b5f4-bf8779c39c69",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CZr8ssjdI3SEPeJd",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Actúa como un clasificador de soporte técnico B2B de alta precisión. Analiza el siguiente mensaje recibido y extrae de forma estructurada: a. Nivel de prioridad (Crítica, Alta, Media, Baja). b. Componente afectado del sistema. c. Impacto estimado en la operación. Mensaje a analizar: {{ $json.mensaje_estudiante }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        48,
+        -80
+      ],
+      "id": "f51ad1b7-34c2-4e73-95f9-6519ee5fe9d7",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -80
+      ],
+      "id": "groq-for-agent1",
+      "name": "Groq Chat Model Agent1",
+      "credentials": {
+        "groqApi": {
+          "id": "Yi6s7op835txWUys",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1SbqLT_v5SiC3hdZrR7ci856__VSvn2gA3Ie_sTLQxdw",
+          "mode": "list",
+          "cachedResultName": "Historial de Tickets IA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbqLT_v5SiC3hdZrR7ci856__VSvn2gA3Ie_sTLQxdw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SbqLT_v5SiC3hdZrR7ci856__VSvn2gA3Ie_sTLQxdw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $now }}",
+            "Mensaje Original": "={{ $('Edit Fields').item.json.body.mensaje_estudiante }}",
+            "Análisis de la IA": "={{ $json.output }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mensaje Original",
+              "displayName": "Mensaje Original",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Análisis de la IA",
+              "displayName": "Análisis de la IA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        400,
+        32
+      ],
+      "id": "57e859a6-269f-46b2-836e-9c03184a168a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CZr8ssjdI3SEPeJd",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store Retrieve": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Retrieve": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store Retrieve",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model Agent1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "9b2c6bc9d2e0da195ad46472605403f1b8771a75869005d03f87545558662664"
+  }
+}
